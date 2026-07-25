@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SmartInvoice.API/SmartInvoice.API.csproj" />
+    <Project Path="src/SmartInvoice.Application/SmartInvoice.Application.csproj" />
+    <Project Path="src/SmartInvoice.Domain/SmartInvoice.Domain.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SmartInvoice.API.Tests/SmartInvoice.API.Tests.csproj" />
+    <Project Path="tests/SmartInvoice.Application.Tests/SmartInvoice.Application.Tests.csproj" />
+    <Project Path="tests/SmartInvoice.Domain.Tests/SmartInvoice.Domain.Tests.csproj" />
+    <Project Path="tests/SmartInvoice.Infrastructure.Tests/SmartInvoice.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>

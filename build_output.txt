@@ -1,0 +1,16 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  SmartInvoice.Domain -> c:\EXT\Invoice\src\SmartInvoice.Domain\bin\Debug\net10.0\SmartInvoice.Domain.dll
+  SmartInvoice.Application -> c:\EXT\Invoice\src\SmartInvoice.Application\bin\Debug\net10.0\SmartInvoice.Application.dll
+  SmartInvoice.Domain.Tests -> c:\EXT\Invoice\tests\SmartInvoice.Domain.Tests\bin\Debug\net10.0\SmartInvoice.Domain.Tests.dll
+  SmartInvoice.Infrastructure -> c:\EXT\Invoice\src\SmartInvoice.Infrastructure\bin\Debug\net10.0\SmartInvoice.Infrastructure.dll
+  SmartInvoice.Infrastructure.Tests -> c:\EXT\Invoice\tests\SmartInvoice.Infrastructure.Tests\bin\Debug\net10.0\SmartInvoice.Infrastructure.Tests.dll
+  SmartInvoice.Application.Tests -> c:\EXT\Invoice\tests\SmartInvoice.Application.Tests\bin\Debug\net10.0\SmartInvoice.Application.Tests.dll
+  SmartInvoice.API -> c:\EXT\Invoice\src\SmartInvoice.API\bin\Debug\net10.0\SmartInvoice.API.dll
+  SmartInvoice.API.Tests -> c:\EXT\Invoice\tests\SmartInvoice.API.Tests\bin\Debug\net10.0\SmartInvoice.API.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:10.20
