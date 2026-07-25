@@ -23,5 +23,40 @@ services:
       - "1025:1025"
       - "8025:8025"
 
+  api:
+    build:
+      context: .
+      dockerfile: src/SmartInvoice.API/Dockerfile
+    container_name: smartinvoice-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=smartinvoice;Username=smartinvoice;Password=SmartInvoice@Dev123
+      - Jwt__Secret=SmartInvoice-Super-Secret-Key-For-Production-Minimum-32-Chars!
+      - Jwt__Issuer=SmartInvoice
+      - Jwt__Audience=SmartInvoiceApp
+      - Jwt__AccessTokenExpirationMinutes=30
+      - Jwt__RefreshTokenExpirationDays=7
+      - Email__SmtpHost=mailhog
+      - Email__SmtpPort=1025
+      - Email__FromAddress=noreply@smartinvoice.dev
+      - Email__FromName=Smart Invoice
+    ports:
+      - "5000:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: src/SmartInvoice.Web
+      dockerfile: Dockerfile
+    container_name: smartinvoice-web
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
 volumes:
   postgres_data:
