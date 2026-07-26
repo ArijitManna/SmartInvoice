@@ -56,16 +56,16 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         SeedData.SeedRoles(modelBuilder);
 
         // Global query filters for multi-tenancy and soft delete
-        //foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-        //{
-        //    var clrType = entityType.ClrType;
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var clrType = entityType.ClrType;
 
-        //    if (clrType.IsAssignableTo(typeof(BaseEntity)))
-        //    {
-        //        modelBuilder.Entity(clrType).HasQueryFilter(
-        //            BuildTenantAndSoftDeleteFilter(clrType));
-        //    }
-        //}
+            if (clrType.IsAssignableTo(typeof(BaseEntity)))
+            {
+                modelBuilder.Entity(clrType).HasQueryFilter(
+                    BuildTenantAndSoftDeleteFilter(clrType));
+            }
+        }
     }
 
     private System.Linq.Expressions.LambdaExpression BuildTenantAndSoftDeleteFilter(Type entityType)

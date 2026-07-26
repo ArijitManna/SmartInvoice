@@ -25,7 +25,7 @@ export function Sidebar() {
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-gray-200 bg-white dark:bg-[#0a0e1a] dark:border-slate-800">
       <div className="flex h-16 items-center gap-2 border-b border-gray-200 dark:border-slate-800 px-6">
         <Building2 className="h-7 w-7 text-blue-600 dark:text-blue-400" />
-        <span className="text-lg font-bold text-gray-900 dark:text-white">Smart <span className="text-blue-600 dark:text-blue-400">Invoice</span></span>
+        <span className="text-lg font-bold text-gray-900 dark:text-white">Invo<span className="text-blue-600 dark:text-blue-400">xa</span></span>
       </div>
 
       <nav className="mt-4 px-3">

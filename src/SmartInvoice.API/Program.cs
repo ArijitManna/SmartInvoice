@@ -170,6 +170,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
 
-app.MapGet("/", () => Results.Ok(new { Status = "Running", App = "Smart Invoice API", Version = "1.0.0" }));
+app.MapGet("/", () => Results.Ok(new { Status = "Running", App = "Invoxa API", Version = "1.0.0" }));
 
 app.Run();
