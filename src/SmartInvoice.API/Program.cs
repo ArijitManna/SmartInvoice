@@ -45,7 +45,8 @@ builder.Services.AddCors(options =>
 // Database
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
 // Hangfire
 builder.Services.AddHangfire(config => config
@@ -129,12 +130,26 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var dbContext = services.GetRequiredService<AppDbContext>();
-        dbContext.Database.Migrate();
+        var pendingMigrations = dbContext.Database.GetPendingMigrations().ToList();
+        
+        if (pendingMigrations.Count > 0)
+        {
+            Console.WriteLine($"Applying {pendingMigrations.Count} pending migration(s): {string.Join(", ", pendingMigrations)}");
+            dbContext.Database.Migrate();
+            Console.WriteLine("Migrations applied successfully.");
+        }
+        else
+        {
+            Console.WriteLine("No pending migrations.");
+        }
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while applying database migrations.");
+        Console.WriteLine($"MIGRATION ERROR: {ex.Message}");
+        if (ex.InnerException != null)
+            Console.WriteLine($"INNER: {ex.InnerException.Message}");
     }
 }
 

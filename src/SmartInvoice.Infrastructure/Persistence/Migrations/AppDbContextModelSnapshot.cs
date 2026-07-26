@@ -1098,35 +1098,7 @@ namespace SmartInvoice.Infrastructure.Persistence.Migrations
 
                             b1.HasKey("CompanyId");
 
-                            b1.ToTable("Companies");
-
-                            b1.WithOwner()
-                                .HasForeignKey("CompanyId");
-                        });
-
-                    b.OwnsOne("SmartInvoice.Domain.ValueObjects.GstInfo", "GstInfo", b1 =>
-                        {
-                            b1.Property<Guid>("CompanyId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Gstin")
-                                .HasMaxLength(15)
-                                .HasColumnType("character varying(15)")
-                                .HasColumnName("GstInfo_Gstin");
-
-                            b1.Property<string>("Pan")
-                                .HasMaxLength(10)
-                                .HasColumnType("character varying(10)")
-                                .HasColumnName("GstInfo_Pan");
-
-                            b1.Property<string>("StateCode")
-                                .HasMaxLength(50)
-                                .HasColumnType("character varying(50)")
-                                .HasColumnName("GstInfo_StateCode");
-
-                            b1.HasKey("CompanyId");
-
-                            b1.ToTable("Companies");
+                            b1.ToTable("Companies", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("CompanyId");
@@ -1173,7 +1145,35 @@ namespace SmartInvoice.Infrastructure.Persistence.Migrations
 
                             b1.HasKey("CompanyId");
 
-                            b1.ToTable("Companies");
+                            b1.ToTable("Companies", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("CompanyId");
+                        });
+
+                    b.OwnsOne("SmartInvoice.Domain.ValueObjects.GstInfo", "GstInfo", b1 =>
+                        {
+                            b1.Property<Guid>("CompanyId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Gstin")
+                                .HasMaxLength(15)
+                                .HasColumnType("character varying(15)")
+                                .HasColumnName("GstInfo_Gstin");
+
+                            b1.Property<string>("Pan")
+                                .HasMaxLength(10)
+                                .HasColumnType("character varying(10)")
+                                .HasColumnName("GstInfo_Pan");
+
+                            b1.Property<string>("StateCode")
+                                .HasMaxLength(50)
+                                .HasColumnType("character varying(50)")
+                                .HasColumnName("GstInfo_StateCode");
+
+                            b1.HasKey("CompanyId");
+
+                            b1.ToTable("Companies", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("CompanyId");
@@ -1234,7 +1234,7 @@ namespace SmartInvoice.Infrastructure.Persistence.Migrations
 
                             b1.HasKey("CustomerId");
 
-                            b1.ToTable("Customers");
+                            b1.ToTable("Customers", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("CustomerId");
@@ -1262,7 +1262,7 @@ namespace SmartInvoice.Infrastructure.Persistence.Migrations
 
                             b1.HasKey("CustomerId");
 
-                            b1.ToTable("Customers");
+                            b1.ToTable("Customers", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("CustomerId");
@@ -1305,7 +1305,7 @@ namespace SmartInvoice.Infrastructure.Persistence.Migrations
 
                             b1.HasKey("CustomerId");
 
-                            b1.ToTable("Customers");
+                            b1.ToTable("Customers", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("CustomerId");

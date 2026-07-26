@@ -13,11 +13,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 
     public Guid? CurrentCompanyId => _companyService?.CompanyId;
 
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-    }
-
-    public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentCompanyService? companyService)
+    public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentCompanyService? companyService = null)
         : base(options)
     {
         _companyService = companyService;
