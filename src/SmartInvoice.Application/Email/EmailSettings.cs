@@ -10,5 +10,5 @@ public class EmailSettings
     public string? SmtpPassword { get; set; }
     public bool UseSsl { get; set; }
     public string FromAddress { get; set; } = "noreply@smartinvoice.dev";
-    public string FromName { get; set; } = "Smart Invoice";
+    public string FromName { get; set; } = "Invoxa";
 }
