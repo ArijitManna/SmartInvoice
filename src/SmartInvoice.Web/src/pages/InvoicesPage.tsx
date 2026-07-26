@@ -87,7 +87,7 @@ export default function InvoicesPage() {
               <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
                 {isLoading && <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-400 dark:text-slate-500">Loading...</td></tr>}
                 {data?.items.map((inv) => {
-                  const st = statusLabels[inv.status] || statusLabels[0];
+                  const st = statusLabels[inv.status] ?? { label: 'Unknown', variant: 'default' as const };
                   return (
                     <tr key={inv.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
                       <td className="px-4 py-3">

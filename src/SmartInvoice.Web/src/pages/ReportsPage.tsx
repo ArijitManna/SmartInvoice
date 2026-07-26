@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, Badge } from '../components/ui';
+import { Card, CardContent, Badge } from '../components/ui';
 import { useGetSalesReportQuery, useGetGstReportQuery, useGetOutstandingReportQuery } from '../store/dashboardApi';
 
 type ReportTab = 'sales' | 'gst' | 'outstanding';

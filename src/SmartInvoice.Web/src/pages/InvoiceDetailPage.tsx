@@ -37,7 +37,7 @@ export default function InvoiceDetailPage() {
     return <div className="text-gray-500">Loading...</div>;
   }
 
-  const st = statusMap[invoice.status] || statusMap[0];
+  const st = statusMap[invoice.status] ?? { label: 'Unknown', variant: 'default' as const };
 
   const handleDownloadPdf = async () => {
     try {

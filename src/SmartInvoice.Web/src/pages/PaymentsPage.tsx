@@ -2,8 +2,6 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, Badge } from '../components/ui';
 import { useGetInvoicesQuery } from '../store/invoiceApi';
 
-const paymentModes = ['Cash', 'Card', 'UPI', 'NEFT', 'Cheque', 'Wallet'];
-
 export default function PaymentsPage() {
   // Show invoices with payments (paid or partially paid)
   const { data: paidInvoices, isLoading: loadingPaid } = useGetInvoicesQuery({ pageSize: 10, status: 2 });
