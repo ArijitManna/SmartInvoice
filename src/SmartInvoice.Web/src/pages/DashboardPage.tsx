@@ -62,9 +62,17 @@ export default function DashboardPage() {
                   <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 11 }} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 11 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
+                    contentStyle={{
+                      backgroundColor: '#1e293b',
+                      border: 'none',
+                      borderRadius: '8px',
+                      color: '#fff',
+                    }}
                     labelStyle={{ color: '#94a3b8' }}
-                    formatter={(value: number | string) => [`₹${Number(value).toLocaleString()}`, 'Revenue']}
+                    formatter={(value) => [
+                      `₹${Number(value ?? 0).toLocaleString()}`,
+                      'Revenue',
+                    ]}
                   />
                   <Area type="monotone" dataKey="amount" stroke="#3b82f6" strokeWidth={2} fill="url(#revenueGradient)" dot={{ fill: '#3b82f6', r: 4 }} activeDot={{ r: 6, fill: '#3b82f6' }} />
                 </AreaChart>
