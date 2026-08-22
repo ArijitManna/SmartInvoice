@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartInvoice.API.Filters;
 using SmartInvoice.Application.Products;
 using SmartInvoice.Application.Products.DTOs;
 
@@ -18,6 +19,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost]
+    [RequirePermission("Product.Create")]
     public async Task<IActionResult> Create([FromBody] CreateProductRequest request)
     {
         var result = await _productService.CreateAsync(request);
@@ -57,6 +59,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [RequirePermission("Product.Edit")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateProductRequest request)
     {
         var result = await _productService.UpdateAsync(id, request);
@@ -70,6 +73,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [RequirePermission("Product.Delete")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var result = await _productService.DeleteAsync(id);

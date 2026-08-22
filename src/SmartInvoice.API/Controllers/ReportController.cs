@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartInvoice.API.Filters;
 using SmartInvoice.Application.Reports;
 
 namespace SmartInvoice.API.Controllers;
@@ -17,6 +18,7 @@ public class ReportController : ControllerBase
     }
 
     [HttpGet("sales")]
+    [RequirePermission("Report.View")]
     public async Task<IActionResult> GetSalesReport(
         [FromQuery] DateTime from,
         [FromQuery] DateTime to,
@@ -27,6 +29,7 @@ public class ReportController : ControllerBase
     }
 
     [HttpGet("outstanding")]
+    [RequirePermission("Report.View")]
     public async Task<IActionResult> GetOutstandingReport()
     {
         var report = await _reportService.GetOutstandingReportAsync();
@@ -34,6 +37,7 @@ public class ReportController : ControllerBase
     }
 
     [HttpGet("gst")]
+    [RequirePermission("Report.View")]
     public async Task<IActionResult> GetGstReport(
         [FromQuery] DateTime from,
         [FromQuery] DateTime to)

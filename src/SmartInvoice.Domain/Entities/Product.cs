@@ -15,6 +15,16 @@ public class Product : AuditableEntity
     public decimal TaxRate { get; set; }
     public Guid? CategoryId { get; set; }
 
+    // Inventory fields
+    public decimal PurchasePrice { get; set; }
+    public decimal OpeningStock { get; set; }
+    public int LowStockThreshold { get; set; }
+    public string? Barcode { get; set; }
+    public string? Brand { get; set; }
+    public bool TrackInventory { get; set; }
+
     // Navigation
     public Category? Category { get; set; }
+    public ICollection<StockEntry> StockEntries { get; set; } = [];
+    public ICollection<Batch> Batches { get; set; } = [];
 }

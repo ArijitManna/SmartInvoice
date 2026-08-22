@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartInvoice.API.Filters;
 using SmartInvoice.Application.Dashboard;
 
 namespace SmartInvoice.API.Controllers;
@@ -17,6 +18,7 @@ public class DashboardController : ControllerBase
     }
 
     [HttpGet]
+    [RequirePermission("Dashboard.View")]
     public async Task<IActionResult> Get()
     {
         var dashboard = await _dashboardService.GetDashboardAsync();

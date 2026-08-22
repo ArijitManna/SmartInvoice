@@ -37,6 +37,12 @@ public class Invoice : AuditableEntity
     public string? TermsAndConditions { get; set; }
     public string? ReferenceNumber { get; set; }
 
+    // Enhancements
+    public Guid? QuotationId { get; set; }
+    public Guid? TemplateId { get; set; }
+    public string? DeliveryChallanNumber { get; set; }
+    public decimal AdvanceAmount { get; set; }
+
     // Navigation
     public ICollection<InvoiceItem> Items { get; set; } = [];
     public ICollection<Payment> Payments { get; set; } = [];

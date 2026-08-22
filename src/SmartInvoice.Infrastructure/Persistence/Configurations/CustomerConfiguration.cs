@@ -21,6 +21,10 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.Property(c => c.ContactPerson).HasMaxLength(200);
         builder.Property(c => c.Notes).HasMaxLength(2000);
 
+        builder.Property(c => c.CreditLimit).HasPrecision(18, 2);
+        builder.Property(c => c.OutstandingBalance).HasPrecision(18, 2);
+        builder.Property(c => c.OpeningBalance).HasPrecision(18, 2);
+
         builder.OwnsOne(c => c.GstInfo, g =>
         {
             g.Property(p => p.Gstin).HasMaxLength(15).HasColumnName("GstInfo_Gstin");

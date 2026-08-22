@@ -12,9 +12,13 @@ using SmartInvoice.Application.Companies;
 using SmartInvoice.Application.Customers;
 using SmartInvoice.Application.Dashboard;
 using SmartInvoice.Application.Email;
+using SmartInvoice.Application.Expenses;
 using SmartInvoice.Application.Invoices;
+using SmartInvoice.Application.Inventory;
 using SmartInvoice.Application.Payments;
+using SmartInvoice.Application.Permissions;
 using SmartInvoice.Application.Products;
+using SmartInvoice.Application.Purchase;
 using SmartInvoice.Application.Reports;
 using SmartInvoice.Application.Subscriptions;
 using SmartInvoice.Domain.Interfaces;
@@ -102,6 +106,14 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ICustomerAddressService, CustomerAddressService>();
+builder.Services.AddScoped<ICustomerLedgerService, CustomerLedgerService>();
+builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IStockTransferService, StockTransferService>();
+builder.Services.AddScoped<IVendorService, VendorService>();
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
+builder.Services.AddScoped<IRecurringInvoiceService, RecurringInvoiceService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
@@ -112,11 +124,13 @@ builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IPaymentGateway, ManualPaymentGateway>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICurrentCompanyService, CurrentCompanyService>();
 
-// Controllers & Swagger
+// Caching & Controllers
+builder.Services.AddMemoryCache();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
@@ -171,5 +185,11 @@ app.MapControllers();
 app.MapHealthChecks("/health");
 
 app.MapGet("/", () => Results.Ok(new { Status = "Running", App = "Invoxa API", Version = "1.0.0" }));
+
+// Register Hangfire recurring jobs
+Hangfire.RecurringJob.AddOrUpdate<IRecurringInvoiceService>(
+    "process-recurring-invoices",
+    svc => svc.ProcessDueRecurringInvoicesAsync(),
+    Hangfire.Cron.Daily(2, 0)); // Run daily at 2 AM
 
 app.Run();

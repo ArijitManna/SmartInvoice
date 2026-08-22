@@ -1,6 +1,7 @@
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartInvoice.API.Filters;
 using SmartInvoice.Application.Email;
 using SmartInvoice.Application.Invoices;
 using SmartInvoice.Application.Invoices.DTOs;
@@ -25,6 +26,7 @@ public class InvoiceController : ControllerBase
     }
 
     [HttpPost]
+    [RequirePermission("Invoice.Create")]
     public async Task<IActionResult> Create([FromBody] CreateInvoiceRequest request)
     {
         var result = await _invoiceService.CreateAsync(request);
@@ -66,6 +68,7 @@ public class InvoiceController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [RequirePermission("Invoice.Edit")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateInvoiceRequest request)
     {
         var result = await _invoiceService.UpdateAsync(id, request);
@@ -107,6 +110,7 @@ public class InvoiceController : ControllerBase
     }
 
     [HttpPost("{id:guid}/send")]
+    [RequirePermission("Invoice.Send")]
     public async Task<IActionResult> Send(Guid id, [FromBody] SendInvoiceRequest request)
     {
         var invoiceResult = await _invoiceService.GetByIdAsync(id);
@@ -123,6 +127,7 @@ public class InvoiceController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [RequirePermission("Invoice.Delete")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var result = await _invoiceService.DeleteAsync(id);

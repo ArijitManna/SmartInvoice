@@ -22,6 +22,10 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.Unit).HasMaxLength(20).HasDefaultValue("Nos");
         builder.Property(p => p.Price).HasPrecision(18, 2);
         builder.Property(p => p.TaxRate).HasPrecision(5, 2);
+        builder.Property(p => p.PurchasePrice).HasPrecision(18, 2);
+        builder.Property(p => p.OpeningStock).HasPrecision(18, 4);
+        builder.Property(p => p.Barcode).HasMaxLength(100);
+        builder.Property(p => p.Brand).HasMaxLength(100);
 
         builder.HasOne(p => p.Category)
             .WithMany(c => c.Products)

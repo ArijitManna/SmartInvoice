@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartInvoice.API.Filters;
 using SmartInvoice.Application.Payments;
 using SmartInvoice.Application.Payments.DTOs;
 
@@ -17,6 +18,7 @@ public class PaymentController : ControllerBase
     }
 
     [HttpPost("api/invoices/{invoiceId:guid}/payments")]
+    [RequirePermission("Invoice.RecordPayment")]
     public async Task<IActionResult> RecordPayment(Guid invoiceId, [FromBody] RecordPaymentRequest request)
     {
         var result = await _paymentService.RecordPaymentAsync(invoiceId, request);

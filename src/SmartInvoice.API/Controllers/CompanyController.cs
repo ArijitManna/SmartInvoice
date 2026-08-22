@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartInvoice.API.Filters;
 using SmartInvoice.Application.Auth;
 using SmartInvoice.Application.Auth.DTOs;
 using SmartInvoice.Application.Companies;
@@ -67,6 +68,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpPut("current")]
+    [RequirePermission("Settings.Manage")]
     public async Task<IActionResult> Update([FromBody] UpdateCompanyRequest request)
     {
         var result = await _companyService.UpdateAsync(request);
