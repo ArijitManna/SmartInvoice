@@ -53,6 +53,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<RecurringInvoice> RecurringInvoices => Set<RecurringInvoice>();
     public DbSet<InvoiceTemplate> InvoiceTemplates => Set<InvoiceTemplate>();
+    public DbSet<ImportJob> ImportJobs => Set<ImportJob>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

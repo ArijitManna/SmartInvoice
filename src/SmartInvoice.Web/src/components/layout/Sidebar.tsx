@@ -8,15 +8,27 @@ import {
   BarChart3,
   Settings,
   Building2,
+  Briefcase,
+  ShoppingCart,
+  Download,
+  ShoppingBag,
+  Lock,
 } from 'lucide-react';
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/customers', label: 'Customers', icon: Users },
+  { to: '/vendors', label: 'Vendors', icon: Briefcase },
   { to: '/products', label: 'Products', icon: Package },
+  { to: '/inventory', label: 'Inventory', icon: ShoppingCart },
   { to: '/invoices', label: 'Invoices', icon: FileText },
+  { to: '/purchase', label: 'Purchase', icon: ShoppingBag },
   { to: '/payments', label: 'Payments', icon: CreditCard },
+  { to: '/expenses', label: 'Expenses', icon: CreditCard },
   { to: '/reports', label: 'Reports', icon: BarChart3 },
+  { to: '/extended-reports', label: 'Advanced Reports', icon: BarChart3 },
+  { to: '/import-export', label: 'Import/Export', icon: Download },
+  { to: '/permissions', label: 'Permissions', icon: Lock },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];
 

@@ -16,6 +16,13 @@ import InvoiceDetailPage from './pages/InvoiceDetailPage';
 import PaymentsPage from './pages/PaymentsPage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
+import VendorsPage from './pages/VendorsPage';
+import ExpensesPage from './pages/ExpensesPage';
+import InventoryPage from './pages/InventoryPage';
+import ImportExportPage from './pages/ImportExportPage';
+import PurchasePage from './pages/PurchasePage';
+import ExtendedReportsPage from './pages/ExtendedReportsPage';
+import PermissionsPage from './pages/PermissionsPage';
 
 function App() {
   return (
@@ -37,6 +44,13 @@ function App() {
               <Route path="/invoices/new" element={<InvoiceFormPage />} />
               <Route path="/invoices/:id" element={<InvoiceDetailPage />} />
               <Route path="/payments" element={<PaymentsPage />} />
+              <Route path="/vendors" element={<VendorsPage />} />
+              <Route path="/inventory" element={<InventoryPage />} />
+              <Route path="/expenses" element={<ExpensesPage />} />
+              <Route path="/purchase" element={<PurchasePage />} />
+              <Route path="/import-export" element={<ImportExportPage />} />
+              <Route path="/extended-reports" element={<ExtendedReportsPage />} />
+              <Route path="/permissions" element={<PermissionsPage />} />
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
