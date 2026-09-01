@@ -333,9 +333,17 @@ public class ImportExportService : IImportExportService
         var headers = new[] { "Invoice Number", "Date", "Due Date", "Customer", "Status", "Sub Total", "Discount", "Tax", "Total", "Paid", "Balance" };
         var data = invoices.Select(i => new object?[]
         {
-            i.InvoiceNumber, i.InvoiceDate.ToString("yyyy-MM-dd"), i.DueDate.ToString("yyyy-MM-dd"),
-            i.Customer.Name, i.Status.ToString(), i.SubTotal, i.DiscountAmount, i.TaxAmount, i.TotalAmount,
-            i.PaidAmount, i.TotalAmount - i.PaidAmount
+            i.InvoiceNumber, 
+            i.InvoiceDate.ToString("yyyy-MM-dd"), 
+            i.DueDate?.ToString("yyyy-MM-dd") ?? "",
+            i.Customer.Name, 
+            i.Status.ToString(), 
+            i.SubTotal, 
+            i.DiscountAmount, 
+            i.TaxAmount, 
+            i.TotalAmount,
+            i.AmountPaid, 
+            i.BalanceDue
         }).ToList();
 
         return Build(format, "Invoices", headers, data);
