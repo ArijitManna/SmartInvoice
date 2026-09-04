@@ -1,0 +1,1 @@
+psql -h localhost -U smartinvoice -d smartinvoice -c "INSERT INTO \"__EFMigrationsHistory\" (\"MigrationId\", \"ProductVersion\") VALUES ('20260901063220_Phase2Enhancements', '10.0.10') ON CONFLICT DO NOTHING;"

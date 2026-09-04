@@ -128,6 +128,7 @@ builder.Services.AddScoped<IPaymentGateway, ManualPaymentGateway>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IErrorLogService, ErrorLogService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICurrentCompanyService, CurrentCompanyService>();
@@ -172,6 +173,7 @@ using (var scope = app.Services.CreateScope())
 
 // Middleware pipeline
 app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseMiddleware<CompanyTenantMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

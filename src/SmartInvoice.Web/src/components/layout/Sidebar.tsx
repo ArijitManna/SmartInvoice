@@ -40,7 +40,7 @@ export function Sidebar() {
         <span className="text-lg font-bold text-gray-900 dark:text-white">Invo<span className="text-blue-600 dark:text-blue-400">xa</span></span>
       </div>
 
-      <nav className="mt-4 px-3">
+      <nav className="mt-4 px-3 h-[calc(100vh-80px)] overflow-y-auto">
         <ul className="space-y-1">
           {navItems.map((item) => (
             <li key={item.to}>

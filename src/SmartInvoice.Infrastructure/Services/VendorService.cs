@@ -11,10 +11,12 @@ namespace SmartInvoice.Infrastructure.Services;
 public class VendorService : IVendorService
 {
     private readonly AppDbContext _context;
+    private readonly ICurrentCompanyService _companyService;
 
-    public VendorService(AppDbContext context)
+    public VendorService(AppDbContext context, ICurrentCompanyService companyService)
     {
         _context = context;
+        _companyService = companyService;
     }
 
     public async Task<Result<VendorResponse>> CreateAsync(VendorRequest request)
@@ -40,7 +42,9 @@ public class VendorService : IVendorService
 
     public async Task<PagedResult<VendorResponse>> GetAllAsync(int page = 1, int pageSize = 20, string? search = null)
     {
-        var query = _context.Vendors.AsQueryable();
+        var query = _context.Vendors
+            .Where(v => v.CompanyId == _companyService.CompanyId)
+            .AsQueryable();
         if (!string.IsNullOrWhiteSpace(search))
         {
             var s = search.ToLower();

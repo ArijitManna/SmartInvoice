@@ -9,46 +9,56 @@ namespace SmartInvoice.Infrastructure.Services;
 public class DashboardService : IDashboardService
 {
     private readonly AppDbContext _context;
+    private readonly ICurrentCompanyService _companyService;
 
-    public DashboardService(AppDbContext context)
+    public DashboardService(AppDbContext context, ICurrentCompanyService companyService)
     {
         _context = context;
+        _companyService = companyService;
     }
 
     public async Task<DashboardResponse> GetDashboardAsync()
     {
         var today = DateTime.UtcNow.Date;
         var monthStart = new DateTime(today.Year, today.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var companyId = _companyService.CompanyId;
 
         // Today's sales
         var todaySales = await _context.Payments
+            .Where(p => p.CompanyId == companyId)
             .Where(p => p.PaymentDate >= today && !p.IsRefund)
             .SumAsync(p => (decimal?)p.Amount) ?? 0;
 
         // Outstanding
         var outstandingAmount = await _context.Invoices
+            .Where(i => i.CompanyId == companyId)
             .Where(i => i.Status != InvoiceStatus.Paid && i.Status != InvoiceStatus.Cancelled)
             .SumAsync(i => (decimal?)i.BalanceDue) ?? 0;
 
         // Invoice counts
         var invoicesThisMonth = await _context.Invoices
+            .Where(i => i.CompanyId == companyId)
             .Where(i => i.CreatedAt >= monthStart)
             .CountAsync();
 
         var paidInvoices = await _context.Invoices
+            .Where(i => i.CompanyId == companyId)
             .Where(i => i.Status == InvoiceStatus.Paid)
             .CountAsync();
 
         var pendingInvoices = await _context.Invoices
+            .Where(i => i.CompanyId == companyId)
             .Where(i => i.Status == InvoiceStatus.Sent || i.Status == InvoiceStatus.PartiallyPaid)
             .CountAsync();
 
         var overdueInvoices = await _context.Invoices
+            .Where(i => i.CompanyId == companyId)
             .Where(i => i.DueDate < today && i.Status != InvoiceStatus.Paid && i.Status != InvoiceStatus.Cancelled)
             .CountAsync();
 
         // GST collected this month
         var gstCollected = await _context.Invoices
+            .Where(i => i.CompanyId == companyId)
             .Where(i => i.InvoiceDate >= monthStart && i.Status != InvoiceStatus.Cancelled)
             .SumAsync(i => (decimal?)i.TaxAmount) ?? 0;
 
@@ -57,6 +67,7 @@ public class DashboardService : IDashboardService
         var startOfTwelveMonths = new DateTime(twelveMonthsAgo.Year, twelveMonthsAgo.Month, 1, 0, 0, 0, DateTimeKind.Utc);
 
         var monthlyRevenue = await _context.Invoices
+            .Where(i => i.CompanyId == companyId)
             .Where(i => i.InvoiceDate >= startOfTwelveMonths && i.Status != InvoiceStatus.Cancelled)
             .GroupBy(i => new { i.InvoiceDate.Year, i.InvoiceDate.Month })
             .Select(g => new { g.Key.Year, g.Key.Month, Amount = g.Sum(i => i.TotalAmount) })
@@ -69,6 +80,7 @@ public class DashboardService : IDashboardService
 
         // Top 5 customers by revenue
         var topCustomers = await _context.Invoices
+            .Where(i => i.CompanyId == companyId)
             .Where(i => i.Status != InvoiceStatus.Cancelled)
             .GroupBy(i => i.CustomerId)
             .Select(g => new { CustomerId = g.Key, TotalAmount = g.Sum(i => i.TotalAmount) })
@@ -78,6 +90,7 @@ public class DashboardService : IDashboardService
 
         var topCustomerIds = topCustomers.Select(c => c.CustomerId).ToList();
         var customerNames = await _context.Customers
+            .Where(c => c.CompanyId == companyId)
             .Where(c => topCustomerIds.Contains(c.Id))
             .ToDictionaryAsync(c => c.Id, c => c.Name);
 
@@ -87,6 +100,7 @@ public class DashboardService : IDashboardService
 
         // Recent payments (last 10)
         var recentPayments = await _context.Payments
+            .Where(p => p.CompanyId == companyId)
             .Where(p => !p.IsRefund)
             .OrderByDescending(p => p.PaymentDate)
             .Take(10)
@@ -97,6 +111,7 @@ public class DashboardService : IDashboardService
 
         // Upcoming due (next 10 unpaid invoices with due dates)
         var upcomingDue = await _context.Invoices
+            .Where(i => i.CompanyId == companyId)
             .Include(i => i.Customer)
             .Where(i => i.DueDate != null && i.DueDate >= today
                 && i.Status != InvoiceStatus.Paid && i.Status != InvoiceStatus.Cancelled)

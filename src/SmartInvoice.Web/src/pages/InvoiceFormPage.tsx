@@ -140,7 +140,7 @@ export default function InvoiceFormPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Line Items</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Line Items</h2>
               <Button type="button" size="sm" variant="secondary" onClick={addItem}>
                 <Plus className="h-4 w-4 mr-1" />Add Item
               </Button>

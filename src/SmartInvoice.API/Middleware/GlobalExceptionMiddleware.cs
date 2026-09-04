@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
+using SmartInvoice.Infrastructure.Services;
 
 namespace SmartInvoice.API.Middleware;
 
@@ -14,7 +16,7 @@ public class GlobalExceptionMiddleware
         _logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context, IErrorLogService errorLogService)
     {
         try
         {
@@ -23,6 +25,39 @@ public class GlobalExceptionMiddleware
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unhandled exception: {Message}", ex.Message);
+
+            // Get caller information
+            var stackFrame = new StackTrace(ex, true).GetFrame(0);
+            var sourceFile = stackFrame?.GetFileName() ?? "Unknown";
+            var sourceMethod = stackFrame?.GetMethod()?.Name ?? "Unknown";
+            var lineNumber = stackFrame?.GetFileLineNumber() ?? 0;
+
+            // Extract request payload if available
+            var requestPayload = string.Empty;
+            if (context.Request.ContentLength > 0)
+            {
+                context.Request.Body.Position = 0;
+                using (var reader = new StreamReader(context.Request.Body))
+                {
+                    requestPayload = await reader.ReadToEndAsync();
+                    context.Request.Body.Position = 0;
+                }
+            }
+
+            // Log to database asynchronously
+            var parsedCompanyId = Guid.TryParse(context.User?.FindFirst("CompanyId")?.Value, out var cId) ? cId : (Guid?)null;
+            _ = errorLogService.LogErrorAsync(
+                ex,
+                sourceMethod,
+                sourceFile,
+                lineNumber,
+                userId: context.User?.FindFirst("sub")?.Value,
+                companyId: parsedCompanyId,
+                requestUrl: context.Request.Path,
+                requestMethod: context.Request.Method,
+                httpStatusCode: context.Response.StatusCode,
+                requestPayload: requestPayload);
+
             await HandleExceptionAsync(context, ex);
         }
     }

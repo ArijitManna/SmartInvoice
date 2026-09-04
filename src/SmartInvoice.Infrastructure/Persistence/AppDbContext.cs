@@ -54,6 +54,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<RecurringInvoice> RecurringInvoices => Set<RecurringInvoice>();
     public DbSet<InvoiceTemplate> InvoiceTemplates => Set<InvoiceTemplate>();
     public DbSet<ImportJob> ImportJobs => Set<ImportJob>();
+    public DbSet<ErrorLog> ErrorLogs => Set<ErrorLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -102,19 +103,17 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         var dbContextExpr = System.Linq.Expressions.Expression.Constant(this);
         var currentCompanyIdProp = System.Linq.Expressions.Expression.Property(dbContextExpr, nameof(CurrentCompanyId));
 
-        // e.CompanyId == CurrentCompanyId.Value — but we compare as Guid? to avoid .Value on null
+        // e.CompanyId == CurrentCompanyId (strict filtering - no bypass for null)
         var entityCompanyId = System.Linq.Expressions.Expression.Property(parameter, nameof(BaseEntity.CompanyId));
         var entityCompanyIdNullable = System.Linq.Expressions.Expression.Convert(entityCompanyId, typeof(Guid?));
 
         var companyIdEquals = System.Linq.Expressions.Expression.Equal(entityCompanyIdNullable, currentCompanyIdProp);
 
-        // CurrentCompanyId == null (bypass tenant filter when no company context)
-        var companyIdIsNull = System.Linq.Expressions.Expression.Equal(
-            currentCompanyIdProp,
-            System.Linq.Expressions.Expression.Constant(null, typeof(Guid?)));
-
-        var tenantFilter = System.Linq.Expressions.Expression.OrElse(companyIdIsNull, companyIdEquals);
-        var combined = System.Linq.Expressions.Expression.AndAlso(notDeleted, tenantFilter);
+        // SECURITY FIX: Removed the null bypass condition
+        // BEFORE: (CurrentCompanyId == null) OR (e.CompanyId == CurrentCompanyId)  — allowed data leak
+        // AFTER:  (e.CompanyId == CurrentCompanyId)                               — strict filtering
+        // When CurrentCompanyId is null, NO records are visible (secure default)
+        var combined = System.Linq.Expressions.Expression.AndAlso(notDeleted, companyIdEquals);
 
         return System.Linq.Expressions.Expression.Lambda(combined, parameter);
     }

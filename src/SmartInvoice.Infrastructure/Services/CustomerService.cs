@@ -11,10 +11,12 @@ namespace SmartInvoice.Infrastructure.Services;
 public class CustomerService : ICustomerService
 {
     private readonly AppDbContext _context;
+    private readonly ICurrentCompanyService _companyService;
 
-    public CustomerService(AppDbContext context)
+    public CustomerService(AppDbContext context, ICurrentCompanyService companyService)
     {
         _context = context;
+        _companyService = companyService;
     }
 
     public async Task<Result<CustomerResponse>> CreateAsync(CreateCustomerRequest request)
@@ -71,7 +73,9 @@ public class CustomerService : ICustomerService
     public async Task<PagedResult<CustomerResponse>> GetAllAsync(
         int page = 1, int pageSize = 20, string? search = null, string? sortBy = null, bool sortDesc = false)
     {
-        var query = _context.Customers.AsQueryable();
+        var query = _context.Customers
+            .Where(c => c.CompanyId == _companyService.CompanyId)
+            .AsQueryable();
 
         // Search
         if (!string.IsNullOrWhiteSpace(search))

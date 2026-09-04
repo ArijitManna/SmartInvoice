@@ -47,10 +47,27 @@ public class CompanyController : ControllerBase
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         var tokenResult = await _authService.LoginAsync(new LoginRequest(email, string.Empty));
 
-        return CreatedAtAction(nameof(GetCurrent), new
+        if (!tokenResult.IsSuccess)
+        {
+            return Ok(new
+            {
+                Company = result.Value,
+                Message = "Company created. Token refresh failed, please re-login.",
+                Error = tokenResult.Error
+            });
+        }
+
+        return Ok(new
         {
             Company = result.Value,
-            Message = "Company created. Please re-login to get updated token with CompanyId."
+            AccessToken = tokenResult.Value!.AccessToken,
+            RefreshToken = tokenResult.Value!.RefreshToken,
+            UserId = tokenResult.Value!.UserId,
+            Email = tokenResult.Value!.Email,
+            FullName = tokenResult.Value!.FullName,
+            CompanyId = tokenResult.Value!.CompanyId,
+            Roles = tokenResult.Value!.Roles,
+            Message = "Company created successfully with updated token."
         });
     }
 

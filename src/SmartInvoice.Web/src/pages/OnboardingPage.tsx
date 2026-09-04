@@ -22,9 +22,24 @@ export default function OnboardingPage() {
 
   const onSubmit = async (data: CreateCompanyRequest) => {
     try {
-      await createCompany(data).unwrap();
-      toast.success('Company created! Please re-login for full access.');
-      navigate('/login');
+      const result = await createCompany(data).unwrap();
+      
+      // If API returned a new token with CompanyId, store it and navigate to dashboard
+      if (result.accessToken) {
+        localStorage.setItem('token', result.accessToken);
+        localStorage.setItem('user', JSON.stringify({
+          id: result.userId,
+          email: result.email,
+          fullName: result.fullName,
+          companyId: result.companyId,
+          roles: result.roles
+        }));
+        toast.success('Company created successfully!');
+        navigate('/dashboard');
+      } else {
+        toast.success('Company created! Please re-login for full access.');
+        navigate('/login');
+      }
     } catch (err: unknown) {
       const error = err as { data?: { error?: string } };
       toast.error(error.data?.error || 'Failed to create company');

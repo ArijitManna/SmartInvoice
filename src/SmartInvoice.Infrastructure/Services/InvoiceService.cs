@@ -11,91 +11,101 @@ namespace SmartInvoice.Infrastructure.Services;
 public class InvoiceService : IInvoiceService
 {
     private readonly AppDbContext _context;
+    private readonly ICurrentCompanyService _companyService;
 
-    public InvoiceService(AppDbContext context)
+    public InvoiceService(AppDbContext context, ICurrentCompanyService companyService)
     {
         _context = context;
+        _companyService = companyService;
     }
 
     public async Task<Result<InvoiceResponse>> CreateAsync(CreateInvoiceRequest request)
     {
-        // Load company for invoice number and state
-        var companyId = _context.CurrentCompanyId;
-        if (!companyId.HasValue)
+        try
         {
-            return Result<InvoiceResponse>.Failure("No company context.");
-        }
-
-        var company = await _context.Companies
-            .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(c => c.Id == companyId.Value && !c.IsDeleted);
-
-        if (company is null)
-        {
-            return Result<InvoiceResponse>.Failure("Company not found.");
-        }
-
-        // Load customer for state comparison
-        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Id == request.CustomerId);
-        if (customer is null)
-        {
-            return Result<InvoiceResponse>.Failure("Customer not found.");
-        }
-
-        // Generate invoice number
-        string invoiceNumber = company.GenerateInvoiceNumber();
-
-        var invoice = new Invoice
-        {
-            InvoiceNumber = invoiceNumber,
-            Type = request.Type,
-            Status = InvoiceStatus.Draft,
-            InvoiceDate = DateTime.UtcNow,
-            DueDate = request.DueDate.HasValue
-                ? DateTime.SpecifyKind(request.DueDate.Value, DateTimeKind.Utc)
-                : null,
-            CustomerId = request.CustomerId,
-            DiscountPercentage = request.DiscountPercentage,
-            Notes = request.Notes,
-            TermsAndConditions = request.TermsAndConditions,
-            ReferenceNumber = request.ReferenceNumber,
-            Currency = company.DefaultCurrency
-        };
-
-        // Create line items
-        foreach (var itemReq in request.Items)
-        {
-            var item = new InvoiceItem
+            // Load company for invoice number and state
+            var companyId = _context.CurrentCompanyId;
+            if (!companyId.HasValue)
             {
-                ProductId = itemReq.ProductId,
-                Description = itemReq.Description,
-                HsnSacCode = itemReq.HsnSacCode,
-                Quantity = itemReq.Quantity,
-                Unit = itemReq.Unit,
-                Rate = itemReq.Rate,
-                DiscountPercentage = itemReq.DiscountPercentage,
-                TaxRate = itemReq.TaxRate,
+                return Result<InvoiceResponse>.Failure("No company context.");
+            }
+
+            var company = await _context.Companies
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(c => c.Id == companyId.Value && !c.IsDeleted);
+
+            if (company is null)
+            {
+                return Result<InvoiceResponse>.Failure("Company not found.");
+            }
+
+            // Load customer for state comparison
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Id == request.CustomerId);
+            if (customer is null)
+            {
+                return Result<InvoiceResponse>.Failure("Customer not found.");
+            }
+
+            // Generate invoice number
+            string invoiceNumber = company.GenerateInvoiceNumber();
+
+            var invoice = new Invoice
+            {
+                InvoiceNumber = invoiceNumber,
+                Type = request.Type,
+                Status = InvoiceStatus.Draft,
+                InvoiceDate = DateTime.UtcNow,
+                DueDate = request.DueDate.HasValue
+                    ? DateTime.SpecifyKind(request.DueDate.Value, DateTimeKind.Utc)
+                    : null,
+                CustomerId = request.CustomerId,
+                DiscountPercentage = request.DiscountPercentage,
+                Notes = request.Notes,
+                TermsAndConditions = request.TermsAndConditions,
+                ReferenceNumber = request.ReferenceNumber,
+                Currency = company.DefaultCurrency,
                 CompanyId = companyId.Value
             };
-            item.Calculate();
-            invoice.Items.Add(item);
+
+            // Create line items
+            foreach (var itemReq in request.Items)
+            {
+                var item = new InvoiceItem
+                {
+                    ProductId = itemReq.ProductId,
+                    Description = itemReq.Description,
+                    HsnSacCode = itemReq.HsnSacCode ?? string.Empty,
+                    Quantity = itemReq.Quantity,
+                    Unit = itemReq.Unit ?? "Nos",
+                    Rate = itemReq.Rate,
+                    DiscountPercentage = itemReq.DiscountPercentage,
+                    TaxRate = itemReq.TaxRate,
+                    CompanyId = companyId.Value
+                };
+                item.Calculate();
+                invoice.Items.Add(item);
+            }
+
+            // Calculate totals with GST
+            string supplierState = company.Address?.GetStateCode() ?? string.Empty;
+            string customerState = customer.BillingAddress?.GetStateCode() ?? string.Empty;
+            invoice.Recalculate(supplierState, customerState);
+
+            _context.Invoices.Add(invoice);
+
+            // Update company's next invoice number using normal EF update
+            company.NextInvoiceNumber++;
+            _context.Companies.Update(company);
+
+            await _context.SaveChangesAsync();
+
+            return await GetByIdAsync(invoice.Id);
         }
-
-        // Calculate totals with GST
-        string supplierState = company.Address?.GetStateCode() ?? string.Empty;
-        string customerState = customer.BillingAddress?.GetStateCode() ?? string.Empty;
-        invoice.Recalculate(supplierState, customerState);
-
-        _context.Invoices.Add(invoice);
-
-        // Update company's next invoice number
-        await _context.Database.ExecuteSqlRawAsync(
-            "UPDATE \"Companies\" SET \"NextInvoiceNumber\" = {0} WHERE \"Id\" = {1}",
-            company.NextInvoiceNumber, company.Id);
-
-        await _context.SaveChangesAsync();
-
-        return await GetByIdAsync(invoice.Id);
+        catch (Exception ex)
+        {
+            var innerEx = ex.InnerException?.Message ?? "No inner exception";
+            return Result<InvoiceResponse>.Failure($"Failed to create invoice: {ex.Message} | Inner: {innerEx}");
+        }
     }
 
     public async Task<Result<InvoiceResponse>> GetByIdAsync(Guid id)
@@ -118,7 +128,10 @@ public class InvoiceService : IInvoiceService
         int page = 1, int pageSize = 20, InvoiceStatus? status = null, Guid? customerId = null,
         DateTime? from = null, DateTime? to = null, string? sortBy = null, bool sortDesc = false)
     {
-        var query = _context.Invoices.Include(i => i.Customer).AsQueryable();
+        var query = _context.Invoices
+            .Where(i => i.CompanyId == _companyService.CompanyId)
+            .Include(i => i.Customer)
+            .AsQueryable();
 
         if (status.HasValue)
         {
